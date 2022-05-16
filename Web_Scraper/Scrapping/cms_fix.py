@@ -8,15 +8,21 @@ soup = BeautifulSoup(source, 'lxml')
 
 article = soup.find('div', id='content')
 
-"""@find_start: Findet h1 Erwägung im Leitentscheid"""
+
 def find_start(html):
+    """@:return h1 tag mit Inhalt Erwägung im Leitentscheid als Ankerpunkt"""
+
     for H in html.find_all('h1'):
         if H.get_text() == 'Erwägungen':
             return H
 
-"""Unter Erwägungen gibt es nummerische Absätze
-mit tag <strong>, welche nun in die Liste number gespeichert wird"""
+
 def find_number(html):
+    """Unter gegeben html "Ankerpunkt" gibt es nummerische Absätze
+    mit tag <strong>.
+    @:parameter html Ankerpunkt zum durch iterieren
+    @:return Diese Nummer werden als Liste zurückgegeben """
+
     number = []
     for H in html.find_all('strong'):
         if H is not None and H.name != 'p':
@@ -26,14 +32,18 @@ def find_number(html):
     return number
 
 
-def find_text(start, html):
-    """Liste mit allen Absatznummern"""
+def find_text(html):
+    """Erstellt ein @:rtype dict (default list)
+    @:return: Erstellt dict mit allen Absätzen (values) zum passender Nummer (keys)
+    @:parameter:html: Html Datei"""
+
     Numbers = find_number(html)
+    start = find_start(html)
 
     """Dict initialisieren"""
     Erwaegungen = collections.defaultdict(list)
 
-    """Element'Aus den Erwägungen:' überspringen"""
+    """Element 'Aus den Erwägungen:' überspringen"""
     start = start.find_next_sibling().find_next_sibling()
 
     """Algorithmus"""
@@ -51,7 +61,7 @@ def find_text(start, html):
                         Erwaegungen[0].append(H.get_text())
             break
 
-        """Vorkalkulationen"""
+        """""""Vorkalkulationen"""""""
         temp = start.find_next_sibling()
         num = Numbers[0]
         nextnum = Numbers[1]
@@ -72,8 +82,7 @@ def find_text(start, html):
         else:
             Erwaegungen[num].append(to_save)
             start = start.find_next_sibling()
-    print(Erwaegungen)
     return Erwaegungen
 
 
-find_text(find_start(article), article)
+find_text(article)
