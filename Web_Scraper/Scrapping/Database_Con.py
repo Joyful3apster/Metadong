@@ -1,28 +1,46 @@
-import mysql.connector
-from mysql.connector.constants import ClientFlag
-
-def Connection_est():
-    config= {'user': 'root', 'password': 'Metadrive123', 'host': '34.65.205.89', 'client_flags': [ClientFlag.SSL],
-             'ssl_ca': 'ssl/server-ca (2).pem', 'ssl_cert': 'ssl/client-cert (1).pem',
-             'ssl_key': 'ssl/client-key (1).pem', 'database': 'testdb'}
-
-    cnxn = mysql.connector.connect(**config)
-
-    return cnxn
-
-def Insert_Data(cnxn):
-    cursor = cnxn.cursor()
-    query = ("INSERT INTO Cases(Fall_NR, ABS_NR ,Textblock , Übereinstimmungen)"
-             "VALUES('147II234','8.2','jkhfslaksjdfa','1') ")
-    cursor.execute(query)
-    cnxn.commit()
-
-def Show_TABLE(cnxn):
-    cursor = cnxn.cursor()
-    cursor.execute('SELECT * FROM Cases')
-    out = cursor.fetchall()
-    for row in out:
-        print(row)
+import sqlite3
 
 
-Show_TABLE(Connection_est())
+def First_step():
+    conn = sqlite3.connect('Database.db')
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE Textblock(
+                    Referenz_Nummer text, 
+                    Absatz text)'''
+                   )
+    conn.commit()
+    conn.close()
+
+
+def add_one(Dict, name):
+    conn = sqlite3.connect('Database.db')
+    cursor = conn.cursor()
+    for key in Dict:
+        for value in Dict[key]:
+            reference_key = name + "-" + key
+            cursor.execute("INSERT INTO Textblock VALUES(?,?)",
+                           (reference_key, value)
+                           )
+            conn.commit()
+            conn.close()
+            conn = sqlite3.connect('Database.db')
+            cursor = conn.cursor()
+
+
+def get_rowID():
+    conn = sqlite3.connect('Database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT rowid, Referenz_Nummer,Absatz FROM Textblock")
+    conn.commit()
+    conn.close()
+
+
+def show_all():
+    conn = sqlite3.connect('Database.db')
+    c = conn.cursor()
+    c.execute("SELECT rowid, * FROM Textblock")
+    items = c.fetchall()
+    for item in items:
+        print(item)
+    conn.commit()
+    conn.close()

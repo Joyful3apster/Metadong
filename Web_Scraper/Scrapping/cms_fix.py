@@ -1,6 +1,10 @@
 import collections
 import requests
+import json
 from bs4 import BeautifulSoup
+import Scrapping.Database_Con
+
+
 
 
 def format_html(html):
@@ -57,14 +61,15 @@ def dict_gen(div):
 
         """Handling wenn Numbers genau ein Element noch hat"""
         if len(Numbers) == 1:
-            Erwaegungen[0].append(start.get_text())
+            numm = Numbers[0]
+            Erwaegungen[numm].append(start.get_text()[len(numm):])
             start = start.find_next_sibling()
             if start:
                 for H in start.find_next_siblings():
-                    if start is not None and start.name != 'p':
+                    if H is not None and H.name != 'p':
                         break
                     else:
-                        Erwaegungen[0].append(H.get_text())
+                        Erwaegungen[numm].append(H.get_text())
             break
 
         """""""Vorkalkulationen"""""""
@@ -86,7 +91,10 @@ def dict_gen(div):
             Numbers.pop(0)
             start = start.find_next_sibling()
         else:
-            Erwaegungen[num].append(to_save)
+            if Test_line_to_cut:
+                Erwaegungen[num].append(to_save_cut)
+            else:
+                Erwaegungen[num].append(to_save)
             start = start.find_next_sibling()
 
     return Erwaegungen
@@ -94,5 +102,8 @@ def dict_gen(div):
 
 def main(html):
     div = format_html(html)
+    name = get_name(html)
     Erw = dict_gen(div)
-    return Erw
+    Scrapping.Database_Con.add_one(Erw, name)
+    Scrapping.Database_Con.show_all()
+
