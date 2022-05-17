@@ -1,44 +1,50 @@
 import collections
-
-from bs4 import BeautifulSoup
 import requests
-
-source = requests.get("https://bger.li/147-II-209").text
-soup = BeautifulSoup(source, 'lxml')
-
-article = soup.find('div', id='content')
+from bs4 import BeautifulSoup
 
 
-def find_start(html):
+def format_html(html):
+    source = requests.get(html).text
+    soup = BeautifulSoup(source, 'lxml')
+    div = soup.find('div', id='content')
+    return div
+
+
+def get_name(html):
+    string = html.split('/')
+    name = str(string[3])
+    return name
+
+
+def find_start(div):
     """@:return h1 tag mit Inhalt Erwägung im Leitentscheid als Ankerpunkt"""
 
-    for H in html.find_all('h1'):
+    for H in div.find_all('h1'):
         if H.get_text() == 'Erwägungen':
             return H
 
 
-def find_number(html):
+def find_number(div):
     """Unter gegeben html "Ankerpunkt" gibt es nummerische Absätze
     mit tag <strong>.
     @:parameter html Ankerpunkt zum durch iterieren
     @:return Diese Nummer werden als Liste zurückgegeben """
 
     number = []
-    for H in html.find_all('strong'):
+    for H in div.find_all('strong'):
         if H is not None and H.name != 'p':
             if H.get_text().replace('.', '').isnumeric():
                 number.append(H.get_text())
-    print(number)
     return number
 
 
-def find_text(html):
+def dict_gen(div):
     """Erstellt ein @:rtype dict (default list)
     @:return: Erstellt dict mit allen Absätzen (values) zum passender Nummer (keys)
     @:parameter:html: Html Datei"""
 
-    Numbers = find_number(html)
-    start = find_start(html)
+    Numbers = find_number(div)
+    start = find_start(div)
 
     """Dict initialisieren"""
     Erwaegungen = collections.defaultdict(list)
@@ -82,7 +88,11 @@ def find_text(html):
         else:
             Erwaegungen[num].append(to_save)
             start = start.find_next_sibling()
+
     return Erwaegungen
 
 
-find_text(article)
+def main(html):
+    div = format_html(html)
+    Erw = dict_gen(div)
+    return Erw
