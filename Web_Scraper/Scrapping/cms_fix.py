@@ -2,7 +2,7 @@ import collections
 import requests
 import json
 from bs4 import BeautifulSoup
-import Scrapping.Database_Con
+import Database_Con
 
 
 
@@ -104,6 +104,6 @@ def main(html):
     div = format_html(html)
     name = get_name(html)
     Erw = dict_gen(div)
-    Scrapping.Database_Con.add_one(Erw, name)
-    Scrapping.Database_Con.show_all()
+    Database_Con.add_one(Erw, name)
+    Database_Con.show_all()
 
