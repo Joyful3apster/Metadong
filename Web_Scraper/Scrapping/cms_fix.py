@@ -1,10 +1,7 @@
 import collections
 import requests
-import json
 from bs4 import BeautifulSoup
-import Scrapping.Database_Con
-
-
+import Database_Con
 
 
 def format_html(html):
@@ -43,6 +40,7 @@ def find_number(div):
 
 
 def dict_gen(div):
+
     """Erstellt ein @:rtype dict (default list)
     @:return: Erstellt dict mit allen Absätzen (values) zum passender Nummer (keys)
     @:parameter:html: Html Datei"""
@@ -61,15 +59,15 @@ def dict_gen(div):
 
         """Handling wenn Numbers genau ein Element noch hat"""
         if len(Numbers) == 1:
-            numm = Numbers[0]
-            Erwaegungen[numm].append(start.get_text()[len(numm):])
+            last_num = Numbers[0]
+            Erwaegungen[last_num].append(start.get_text()[len(last_num):])
             start = start.find_next_sibling()
             if start:
                 for H in start.find_next_siblings():
                     if H is not None and H.name != 'p':
                         break
                     else:
-                        Erwaegungen[numm].append(H.get_text())
+                        Erwaegungen[last_num].append(H.get_text())
             break
 
         """""""Vorkalkulationen"""""""
@@ -104,6 +102,6 @@ def main(html):
     div = format_html(html)
     name = get_name(html)
     Erw = dict_gen(div)
-    Scrapping.Database_Con.add_one(Erw, name)
-    Scrapping.Database_Con.show_all()
+    Database_Con.add_one(Erw, name)
+    Database_Con.show_all()
 
