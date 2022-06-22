@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import collections
 import requests
 from bs4 import BeautifulSoup
 import Database_Con
+
 import unidecode
 
 
@@ -40,7 +43,6 @@ def find_number(div):
 
 
 def delete_span_tag(H):
-
     for span_Tag in H.findAll('span', class_="pagebreak"):
         span_Tag.replace_with('')
     return H
@@ -58,7 +60,10 @@ def dict_gen(div):
     Erwaegungen = collections.defaultdict(list)
 
     """Element 'Aus den Erwägungen:' überspringen"""
-    start = delete_span_tag(start.find_next_sibling().find_next_sibling())
+    if start.find_next_sibling().get_text() == 'Aus den Erwägungen:':
+        start = delete_span_tag(start.find_next_sibling().find_next_sibling())
+    else:
+        start = delete_span_tag(start.find_next_sibling())
 
     """Algorithmus"""
     while True:
@@ -89,10 +94,12 @@ def dict_gen(div):
         Test_next_line_numeric = temp.get_text()[0:len(nextnum)].replace('.', '').isnumeric()
         Test_next_prev_same = temp.get_text()[0:len(nextnum)] is not start.get_text()[0:len(num)]
         Test_line_to_cut = start.get_text()[0:len(num)].replace('.', '').isnumeric()
-        get_encoding_cut = start.get_text().encode('utf-8').decode()[len(num):]
-        to_save_cut = unidecode.unidecode(get_encoding_cut)
-        get_encoding = start.get_text().encode('utf-8').decode()
-        to_save = unidecode.unidecode(get_encoding)
+        get_encoding_cut = start.get_text()[len(num):]
+        to_save_cut = get_encoding_cut.encode('utf-8').decode()
+        to_save_cut = to_save_cut.replace(u'\xa0', ' ')
+        get_encoding = start.get_text()
+        to_save = get_encoding.encode('utf-8').decode()
+        to_save = to_save.replace(u'\xa0', ' ')
         """"""""""""""""""""""""""""""
 
         if Test_next_line_numeric and Test_next_prev_same:

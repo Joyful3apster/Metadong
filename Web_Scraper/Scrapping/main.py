@@ -1,6 +1,6 @@
 import cms_fix
 
-Leitentscheide = ['140 I 2',
+"""Leitentscheide = ['140 I 2',
 '140 I 50',
 '140 I 58',
 '140 I 77',
@@ -189,7 +189,8 @@ Leitentscheide = ['140 I 2',
 '143 II 694',
 '143 II 699'
  ]
-
+"""
+Leitentscheide = ['143 II 699']
 
 if __name__ == '__main__':
     for value in Leitentscheide:

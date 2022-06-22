@@ -1,6 +1,17 @@
 import sqlite3
 import ppdeep
 
+array = ['Erwägungen', 'Bundesgericht', 'Anhang', 'Absatz', 'Auslegung',
+         'Beschwerdeführer', 'Rechtssprechung', 'Rechtsgrundlagen', 'Grundsatz',
+         'Gegenvorschlag', 'Gesetz', 'Zuständigkeit', 'Strafbehörden', 'Bundesgesetzgebung',
+         'Wortlaut', 'Anzeige', 'Beschwerdeführerin']
+
+
+def search_and_delete(string):
+    for x in array:
+        string = string.replace(x, '')
+    return string
+
 
 def First_step():
     conn = sqlite3.connect('Database.db')
@@ -96,5 +107,3 @@ def comparer():
                     second_adder.execute('UPDATE TEXTBLOCK SET Equivalent = ? WHERE ID = ? ', (digit, ID))
     conn.commit()
     conn.close()
-
-comparer()
